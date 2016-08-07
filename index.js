@@ -1,10 +1,10 @@
+const updateDom = require('nanomorph/update-dom')
 const sheetRouter = require('sheet-router')
 const walk = require('sheet-router/walk')
 const barracks = require('barracks')
 const nanoraf = require('nanoraf')
 const assert = require('assert')
 const xtend = require('xtend')
-const yo = require('yo-yo')
 
 const createLocationModel = require('./location-model')
 
@@ -18,7 +18,7 @@ function choo (opts) {
   const _store = start._store = barracks()
   var _router = start._router = null
   var _defaultRoute = null
-  var _rootNode = null
+  var _update = null
   var _routes = null
   var _frame = null
 
@@ -62,7 +62,7 @@ function choo (opts) {
     const state = _store.state({state: {}})
 
     const tree = _router(state.location.pathname, state)
-    _rootNode = tree
+    _update = updateDom(tree)
     return tree
   }
 
@@ -92,7 +92,7 @@ function choo (opts) {
     if (!_frame) {
       _frame = nanoraf(function (state, prev) {
         const newTree = _router(state.location.pathname, state, prev)
-        _rootNode = yo.update(_rootNode, newTree)
+        _update(newTree)
       })
     }
     _frame(state, prev)
@@ -120,4 +120,3 @@ function choo (opts) {
     }
   }
 }
-
